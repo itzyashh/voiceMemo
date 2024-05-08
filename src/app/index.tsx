@@ -1,13 +1,17 @@
 import { useState } from 'react';
-import { View, StyleSheet, Button, Text, FlatList, Touchable, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Audio } from 'expo-av';
 import { Recording } from 'expo-av/build/Audio';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import MemoListItem from '../components/MemoListItem';
 
 
 export default function App() {
   const [recording, setRecording] = useState<Recording>();
   const [memos, setMemos] = useState<string[]>([])
   const [permissionResponse, requestPermission] = Audio.usePermissions();
+
+   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
   async function startRecording() {
     try {
@@ -51,22 +55,31 @@ export default function App() {
     console.log('Recording stopped and stored at', uri);
   }
 
+  const animateButton = useAnimatedStyle(() => {
+    return {
+      width: recording ? withTiming(35) : withTiming(55),
+      height: recording ? withTiming(35) : withTiming(55),
+      borderRadius:recording ? withTiming(5) : withTiming(50),
+    };
+  }
+  );
+
   return (
     <View style={styles.container}>
     <FlatList
       data={memos}
-      renderItem={({item})=><Text>{item}</Text>}
+      renderItem={({item})=><MemoListItem uri={item}/>}
       />
 
     <View style={styles.footer}>
       <View style={styles.border}>
-      <TouchableOpacity
+      <AnimatedTouchable
       activeOpacity={0.7}
-      style={styles.button}
+      style={[styles.button, animateButton]}
       onPress={recording ? stopRecording : startRecording}
       >
 
-      </TouchableOpacity>
+      </AnimatedTouchable>
       </View>
     </View>
 
@@ -101,7 +114,8 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
     borderRadius: 50,
-
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 5,
     borderColor: 'gray',
   },
