@@ -4,16 +4,22 @@ import { Entypo } from '@expo/vector-icons';
 import { AVPlaybackStatus, Audio } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio';
 import dayjs from 'dayjs';
+
+type Memo = {
+  uri: string;
+  metering: number[];
+};
+
 interface MemoListItemProps {
-    uri: string
+  data: Memo;
 }
 
-const MemoListItem: React.FC<MemoListItemProps> = ({ uri }) => {
+const MemoListItem: React.FC<MemoListItemProps> = ({ data }) => {
 
-
+  const { uri } = data;
+  console.log('data', data)
   const [sound, setSound] = useState<Sound>();
   const [status, setStatus] = useState<AVPlaybackStatus>();
-
   const isPlaying = status?.isLoaded && status?.isPlaying;
 
   const currentProgress = status?.isLoaded && status?.positionMillis 
@@ -82,7 +88,7 @@ const MemoListItem: React.FC<MemoListItemProps> = ({ uri }) => {
         <View style={styles.track} />
       <Text
       numberOfLines={1}
-      style={styles.duration}>{millisToMinutesAndSeconds(currentProgress ?? 0)} / {millisToMinutesAndSeconds(totalProgress ?? 0)}
+      style={styles.duration}>{millisToMinutesAndSeconds(currentProgress || 0)} / {millisToMinutesAndSeconds(totalProgress || 0)}
       </Text>
       </View>
     </View>
